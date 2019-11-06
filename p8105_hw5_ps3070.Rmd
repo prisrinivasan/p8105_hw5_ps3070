@@ -1,11 +1,14 @@
 ---
 title: "p8105_hw5_ps3070"
 output: html_document
+editor_options: 
+  chunk_output_type: inline
 ---
 
 
 ```{r}
 library(tidyverse)
+library(knitr)
 ```
 
 ## Problem 1
@@ -39,7 +42,8 @@ replace_iris_missing = function(a) {
 }
 
 output = map_df(iris_with_missing, replace_iris_missing) #maps function to each vector 
-output
+
+output #to check that it worked
 ```
 
 ## Problem 2
@@ -49,8 +53,50 @@ This dataset contains data from a longitudinal study that included a control arm
 Create a tidy dataframe containing data from all participants, including the subject ID, arm, and observations over time:
 
 Start with a dataframe containing all file names; the list.files function will help
+
+```{r make tibble of file names}
+names = tibble(
+  file_names = list.files(path = "./data") #creating vector file_names
+  )
+
+names #created a df with file names called names
+```
+
+There are `r names %>% filter(grepl("con", pull(names, file_names))) %>% nrow()` patients in the control arm and 
+`r names %>% filter(grepl("exp", pull(names, file_names))) %>% nrow()` patients in the experimental arm. These file names are now stored in one column in the `names` data frame.
+
+```{r function to get data from "data" directory}
+get_data = function(x) {
+  directory = "./data/"
+  data = read.csv(paste(directory, x, sep = ""))
+  return(data)
+}
+```
+
 Iterate over file names and read in data for each subject using purrr::map and saving the result as a new variable in the dataframe
+
 Tidy the result; manipulate file names to include control arm and subject ID, make sure weekly observations are “tidy”, and do any other tidying that’s necessary
+
+```{r}
+tidy_df = names %>% 
+  mutate(obs = map(file_names, get_data)) %>% 
+  unnest(obs) %>%
+  janitor::clean_names() %>% 
+  separate(file_names, into = c("arm", "subject"), sep = "_") %>%
+  mutate(subject = str_replace(subject, ".csv", "")) %>% 
+  gather(key = week, value = meas, week_1:week_8) %>%
+  separate(week, into = c("extra", "week"), sep = "_") %>% 
+  select(-extra) %>% 
+  mutate(arm = as.factor(arm),
+         subject = as.factor(subject),
+         week = as.numeric(week),
+         meas = as.numeric(meas))
+
+head(tidy_df) %>%
+  kable(format = "html", caption = "Study Measurements")
+```
+
+
 Make a spaghetti plot showing observations on each subject over time, and comment on differences between groups.
 
 ## Problem 3
