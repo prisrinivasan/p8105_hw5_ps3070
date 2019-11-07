@@ -106,7 +106,7 @@ Make a spaghetti plot showing observations on each subject over time, and commen
 
 ```{r spaghetti plot}
 files_plot = tidy_df %>% 
-  ggplot(aes(x = week, y = meas, color = subject)) +
+  ggplot(aes(x = week, y = meas, color = subject, group = arm)) +
   geom_line() +
   facet_grid(~arm) +
   labs(x = "Week",
@@ -118,15 +118,59 @@ files_plot
 ## Problem 3
 
 First, I set the following design elements:
-```{r}
+```{r set design elements}
 n = 30
-x_i1 = rnorm(n, 0, 1) #x draws from standard normal dist
-beta_0 = 2
+x_i1 = rnorm(n, 0, 1) #x draws from standard normal dist so mean is 0 and sd is 1
+beta0 = 2
 sd = 50 
 
-beta_1 = 0
+beta1 = 0
 ```
 
 Then, I am generating 10,000 datasets from the following model:
 
 $$ y_i = \beta_0 + \beta_1 x_{i1} + \epsilon_{i} $$
+
+with $\epsilon_{i} ∼ N[0,\sigma^2]$.
+
+With an alpha of 0.05 (5% significance level), I am testing:
+$$ H : \beta_1 = 0 $$
+_Hint: to obtain the estimate and p-value, use `broom::tidy` to clean the output of `lm`._ 
+
+```{r}
+sim = function(n = 30, beta0 = 2, beta1 = 0) {
+  
+  sim_data = tibble(
+    x_i1 = rnorm(n, mean = 0, sd = 1),
+    y = beta0 + beta1 * x_i1 + rnorm(n, 0, 50)
+  )
+  
+  ls_fit = lm(y ~ x_i1, data = sim_data) %>% 
+    broom::tidy()
+}
+
+betas = tibble(beta1 = 0:6) 
+
+beta1_sim = map_df(betas, sim) #maps function to each vector 
+
+broom::glance(ls_fit)
+
+simulation =
+  rerun(10000, sim(30, 2, 0)) %>% 
+  bind_rows()
+
+```
+
+```{r FROM JEFFS CODE}
+
+simulation %>% 
+  pivot_longer(
+    beta1_hat:p_value,
+    names_to = "parameter", 
+    values_to = "estimate") %>% 
+  group_by(parameter) %>% 
+  summarize(emp_mean = mean(estimate),
+            emp_var = var(estimate)) %>% 
+  knitr::kable(digits = 3)
+```
+
