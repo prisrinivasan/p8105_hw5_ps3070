@@ -44,6 +44,9 @@ replace_iris_missing = function(a) {
 output = map_df(iris_with_missing, replace_iris_missing) #maps function to each vector 
 
 output #to check that it worked
+
+head(output) %>% 
+  kable()
 ```
 
 ## Problem 2
@@ -67,8 +70,10 @@ There are `r names %>% filter(grepl("con", pull(names, file_names))) %>% nrow()`
 
 ```{r function to get data from "data" directory}
 get_data = function(x) {
-  directory = "./data/"
-  data = read.csv(paste(directory, x, sep = ""))
+  
+  {directory = "./data/"
+  data = read.csv(paste(directory, x, sep = ""))}
+  
   return(data)
 }
 ```
@@ -87,10 +92,10 @@ tidy_df = names %>%
   gather(key = week, value = meas, week_1:week_8) %>%
   separate(week, into = c("extra", "week"), sep = "_") %>% 
   select(-extra) %>% 
-  mutate(arm = as.factor(arm),
+  mutate(arm = as.character(arm),
          subject = as.factor(subject),
-         week = as.numeric(week),
-         meas = as.numeric(meas))
+         week = as.numeric(week)) %>% 
+  arrange(arm)
 
 head(tidy_df) %>%
   kable(format = "html", caption = "Study Measurements") #tibble sorted by week
@@ -101,14 +106,27 @@ Make a spaghetti plot showing observations on each subject over time, and commen
 
 ```{r spaghetti plot}
 files_plot = tidy_df %>% 
-  ggplot(aes(x = week, y = meas, group = subject, color = arm)) + 
+  ggplot(aes(x = week, y = meas, color = subject)) +
   geom_line() +
-   labs(
-    title = "Study Measurements by Week",
-    x = "Week",
-    y = "Measurement"
-   )
+  facet_grid(~arm) +
+  labs(x = "Week",
+       y = "Measurement")
 
 files_plot
 ```
 
+## Problem 3
+
+First, I set the following design elements:
+```{r}
+n = 30
+x_i1 = rnorm(n, 0, 1) #x draws from standard normal dist
+beta_0 = 2
+sd = 50 
+
+beta_1 = 0
+```
+
+Then, I am generating 10,000 datasets from the following model:
+
+$$ y_i = \beta_0 + \beta_1 x_{i1} + \epsilon_{i} $$
