@@ -1,6 +1,6 @@
 ---
 title: "p8105_hw5_ps3070"
-output: html_document
+output: github_document
 editor_options: 
   chunk_output_type: inline
 ---
@@ -146,32 +146,5 @@ sim = function(n = 30, beta0 = 2, beta1 = 0) {
     broom::tidy()
 }
 
-beta1_sim = 
-  tibble(beta1 = 0:6) %>% 
-  mutate(
-    output_list = map_d
-  )
-
-beta1_sim = map_df(betas, sim) #maps function to each vector 
-
-broom::glance(ls_fit)
-
-simulation =
-  rerun(10000, sim(30, 2, 0)) %>% 
-  bind_rows()
 
 ```
-
-```{r FROM JEFFS CODE}
-
-simulation %>% 
-  pivot_longer(
-    beta1_hat:p_value,
-    names_to = "parameter", 
-    values_to = "estimate") %>% 
-  group_by(parameter) %>% 
-  summarize(emp_mean = mean(estimate),
-            emp_var = var(estimate)) %>% 
-  knitr::kable(digits = 3)
-```
-
