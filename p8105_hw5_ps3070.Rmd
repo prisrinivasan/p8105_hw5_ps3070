@@ -9,6 +9,7 @@ editor_options:
 ```{r}
 library(tidyverse)
 library(knitr)
+library(patchwork)
 ```
 
 ## Problem 1
@@ -108,7 +109,8 @@ files_plot = tidy_df %>%
   geom_line() +
   labs(x = "Week",
        y = "Measurement",
-       title = "Observations by Week based on Study Arm")
+       title = "Observations by Week based on Study Arm") +
+  scale_x_continuous(breaks = c(1:8))
 
 files_plot
 ```
@@ -175,9 +177,8 @@ head(beta1_sim) %>%
 
 Below is a plot showing the proportion of times the null was rejected (power) on the y axis and the true value of $\beta_1$  on the x axis. As seen in this plot, as effect size increases, power increases. 
 
-   * Describe the association between effect size and power
 
-```{r}
+```{r power plot}
 power_plot = beta1_sim %>% 
   group_by(betas) %>% 
   summarise(n = n(), #total count
@@ -200,7 +201,8 @@ overall_plot = beta1_sim %>%
   summarise(mean_beta1 = mean(estimate)) %>% 
   ggplot(aes(x = betas, y = mean_beta1)) +
   geom_point() +
-  geom_line()
+  geom_line() +
+  scale_x_continuous(breaks = c(0:6))
 ```
 
 Plot to show the average estimate of $\hat{\beta}_1$ only where null was rejected (p < 0.05) on the y-axis and the true value of $\beta_1$ on the x-axis
@@ -212,7 +214,13 @@ rej_plot = beta1_sim %>%
   summarise(mean_rej_beta1 = mean(estimate)) %>% 
   ggplot(aes(x = betas, y = mean_rej_beta1)) +
   geom_point() +
-  geom_line()
+  geom_line() +
+  scale_x_continuous(breaks = c(0:6))
+```
+
+
+```{r}
+plot = overall_plot + rej_plot
 ```
 
 Overlay:
