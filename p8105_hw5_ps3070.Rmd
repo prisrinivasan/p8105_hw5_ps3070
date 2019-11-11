@@ -59,6 +59,8 @@ head(output) %>%
   kable(format = "html", caption = "Iris Dataset without Missing")
 ```
 
+
+
 ## Problem 2
 
 This problem uses data from a longitudinal study with control and experimental arms. I loaded the data from each separate file, consolidated into one data frame, and tidied the data frame to include all observations, subject ID, arm, and a time variable (week). 
@@ -117,6 +119,8 @@ files_plot = tidy_df %>%
 
 files_plot
 ```
+
+
 
 ## Problem 3
 
