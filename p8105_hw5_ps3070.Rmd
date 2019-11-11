@@ -22,7 +22,7 @@ theme_set(theme_light() + theme(legend.position = "bottom"))
 ```
 
 
-## Problem 1
+# Problem 1
 
 Loading the iris dataset using code from instructions, and confirming that it is a list:
 
@@ -61,7 +61,7 @@ head(output) %>%
 
 
 
-## Problem 2
+# Problem 2
 
 This problem uses data from a longitudinal study with control and experimental arms. I loaded the data from each separate file, consolidated into one data frame, and tidied the data frame to include all observations, subject ID, arm, and a time variable (week). 
 
@@ -122,7 +122,7 @@ files_plot
 
 
 
-## Problem 3
+# Problem 3
 
 First, I set the seed for reproducibility and set the following design elements:
 
