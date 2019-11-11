@@ -59,6 +59,7 @@ head(output) %>%
   kable(format = "html", caption = "Iris Dataset without Missing")
 ```
 
+The final dataset here shows  means for numeric variables and "virginica" for character variables to fill in missing values.
 
 
 # Problem 2
